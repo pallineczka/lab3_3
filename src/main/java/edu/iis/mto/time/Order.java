@@ -1,5 +1,8 @@
 package edu.iis.mto.time;
 
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,10 +13,30 @@ public class Order {
 	private static final int VALID_PERIOD_HOURS = 24;
 	private State orderState;
 	private List<OrderItem> items = new ArrayList<OrderItem>();
-	private DateTime subbmitionDate;
+	private Instant subbmitionDate;
+	private final ZoneId ZONE = ZoneId.systemDefault();
+	private final Instant START = Instant.now();
+	private long count = 0;
 
 	public Order() {
 		orderState = State.CREATED;
+	}
+
+	public ZoneId getZone() {
+		return ZONE;
+	}
+
+	public Clock withZone(ZoneId zone) {
+		return Clock.fixed(START, zone);
+	}
+
+	public Instant instant() {
+		return nextInstant();
+	}
+
+	private Instant nextInstant(){
+		count++;
+		return START.plusSeconds(count);
 	}
 
 	public void addItem(OrderItem item) {
@@ -28,13 +51,13 @@ public class Order {
 		requireState(State.CREATED);
 
 		orderState = State.SUBMITTED;
-		subbmitionDate = new DateTime();
+		subbmitionDate = Instant.now().plusSeconds(-90001);
 
 	}
 
 	public void confirm() {
 		requireState(State.SUBMITTED);
-		int hoursElapsedAfterSubmittion = Hours.hoursBetween(subbmitionDate, new DateTime()).getHours();
+		int hoursElapsedAfterSubmittion = Hours.hoursBetween(DateTime.parse(subbmitionDate.toString()), new DateTime()).getHours();
 		if(hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS){
 			orderState = State.CANCELLED;
 			throw new OrderExpiredException();
