@@ -1,10 +1,12 @@
 package edu.iis.mto.time;
 
 import org.junit.Before;
+import org.junit.Test;
 import org.mockito.Mock;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 
 
 import static org.junit.Assert.*;
@@ -23,5 +25,10 @@ public class OrderTest {
         order = new Order(clock);
         when(clock.instant()).thenAnswer((invocation) -> currentTime);
     }
-
+    @Test
+    public void orderConfirmationBeforeBeExpiredShouldPass() {
+        order.submit();
+        currentTime = currentTime.plus(1, ChronoUnit.HOURS);
+        order.confirm();
+    }
 }
