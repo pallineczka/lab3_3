@@ -17,7 +17,6 @@ public class Order {
 
     public Order(Clock clock) {
         orderState = State.CREATED;
-        orderState = State.CREATED;
         this.clock = clock;
     }
 
@@ -34,6 +33,7 @@ public class Order {
         requireState(State.CREATED);
 
         orderState = State.SUBMITTED;
+        subbmitionDate = clock.instant();
 
     }
 

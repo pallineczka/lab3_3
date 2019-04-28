@@ -31,4 +31,11 @@ public class OrderTest {
         currentTime = currentTime.plus(1, ChronoUnit.HOURS);
         order.confirm();
     }
+
+    @Test(expected = OrderExpiredException.class)
+    public void orderConfirmationAfterExpirationShouldFail() {
+        order.submit();
+        currentTime = currentTime.plus(2, ChronoUnit.DAYS);
+        order.confirm();
+    }
 }
