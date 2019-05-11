@@ -30,4 +30,12 @@ public class OrderTest {
         Mockito.when(clock.instant()).thenReturn(timeNow);
         Assertions.assertThrows(OrderExpiredException.class, () -> order.confirm());
     }
+
+    @Test()
+    public void confirmWithoutException() {
+        order.submit();
+        timeNow = timeNow.plus(24, ChronoUnit.HOURS);
+        Mockito.when(clock.instant()).thenReturn(timeNow);
+        order.confirm();
+    }
 }
