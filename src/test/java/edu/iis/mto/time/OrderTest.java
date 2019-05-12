@@ -34,7 +34,12 @@ public class OrderTest {
         Mockito.when(clock.instant()).thenReturn(time);
         assertThrows(OrderExpiredException.class, () -> order.confirm());
     }
-
+    @Test
+    public void call_orderconfirm_with_correct_time_should_be_call_without_exception () {
+        order.submit();
+        time = time.plus(24, ChronoUnit.HOURS);
+        order.confirm();
+    }
 
 
 }
