@@ -9,7 +9,7 @@ import java.util.List;
 import org.joda.time.DateTime;
 import org.joda.time.Hours;
 
-public class Order extends Clock{
+public class Order{
 	private static final int VALID_PERIOD_HOURS = 24;
 	private State orderState;
 	private List<OrderItem> items = new ArrayList<OrderItem>();
@@ -18,31 +18,12 @@ public class Order extends Clock{
 	private final ZoneId ZONE = ZoneId.systemDefault();
 	private final Instant START = Instant.now();
 	private long count = 0;
+	private Clock clock;
 
-	public Order() {
+	public Order(Clock clock) {
 		orderState = State.CREATED;
+		this.clock=clock;
 	}
-
-	@Override
-	public ZoneId getZone() {
-		return ZONE;
-	}
-
-	@Override
-	public Clock withZone(ZoneId zone) {
-		return Clock.fixed(START, zone);
-	}
-
-	@Override
-	public Instant instant() {
-		return nextInstant();
-	}
-
-	private Instant nextInstant(){
-		count++;
-		return START.plusSeconds(count);
-	}
-
 	public void addItem(OrderItem item) {
 		requireState(State.CREATED, State.SUBMITTED);
 
@@ -89,7 +70,7 @@ public class Order extends Clock{
 
 	}
 
-	public static enum State {
+	public enum State {
 		CREATED, SUBMITTED, CONFIRMED, REALIZED, CANCELLED
 	}
 }
