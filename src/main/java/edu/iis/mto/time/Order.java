@@ -17,9 +17,11 @@ public class Order {
 	private final ZoneId ZONE = ZoneId.systemDefault();
 	private final Instant START = Instant.now();
 	private long count = 0;
+	private Clock clock;
 
-	public Order() {
+	public Order(Clock clock) {
 		orderState = State.CREATED;
+		this.clock = clock;
 	}
 
 	public ZoneId getZone() {
@@ -51,13 +53,14 @@ public class Order {
 		requireState(State.CREATED);
 
 		orderState = State.SUBMITTED;
-		subbmitionDate = Instant.now().plusSeconds(-90001);
+		subbmitionDate = clock.instant();
 
 	}
 
 	public void confirm() {
 		requireState(State.SUBMITTED);
-		int hoursElapsedAfterSubmittion = Hours.hoursBetween(DateTime.parse(subbmitionDate.toString()), new DateTime()).getHours();
+		int hoursElapsedAfterSubmittion = Hours.hoursBetween(new org.joda.time.Instant(subbmitionDate.toEpochMilli()),
+				new org.joda.time.Instant(clock.instant().toEpochMilli())).getHours();
 		if(hoursElapsedAfterSubmittion > VALID_PERIOD_HOURS){
 			orderState = State.CANCELLED;
 			throw new OrderExpiredException();
@@ -72,7 +75,7 @@ public class Order {
 	State getOrderState() {
 		return orderState;
 	}
-	
+
 	private void requireState(State... allowedStates) {
 		for (State allowedState : allowedStates) {
 			if (orderState == allowedState)
